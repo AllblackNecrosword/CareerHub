@@ -107,6 +107,7 @@ const updateprofileHandler = async (req, res) => {
     console.log(error);
   }
 };
+
 const tryout = (req, res) => {
   res.status(200).json({ message: "i am working" });
 };
@@ -116,5 +117,6 @@ export {
   signupHandler,
   logoutHandler,
   updateprofileHandler,
-  tryout,
+  tryout
+
 };

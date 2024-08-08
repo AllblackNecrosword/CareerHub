@@ -4,9 +4,11 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./ultils/Db.js";
 import userRoute from "./routes/userRoute.js";
+import companyRoute from "./routes/companyRoute.js";
 
 dotenv.config({});
 const app = express();
+
 
 //middleware
 app.use(express.json());
@@ -23,7 +25,7 @@ const PORT = process.env.PORT || 3000;
 
 //APIs
 app.use("/api", userRoute);
-
+app.use("/api/company",companyRoute);
 app.listen(PORT, () => {
   connectDB();
   console.log(`Server is running at port http://localhost:${PORT}`);
