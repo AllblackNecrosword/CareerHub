@@ -4,9 +4,9 @@ const Latestjobs = () => {
   return (
     <div className=" w-3/4 m-auto mt-12">
       <div className="text-center text-2xl font-semibold ">
-        <h2 className="">
+        <h1 className="text-3xl">
           Whats trending on <span className="text-blue-500">CareerHub</span>
-        </h2>
+        </h1>
       </div>
       {/* card */}
       <div className="flex flex-wrap justify-center flex-row gap-5 my-12">

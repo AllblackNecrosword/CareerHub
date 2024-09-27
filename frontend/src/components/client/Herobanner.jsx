@@ -2,7 +2,7 @@ import React from 'react'
 
 const Herobanner = () => {
   return (
-    <div className="text-center">
+    <div className="text-center mt-20">
     <div className="flex flex-col gap-5 py-10">
       <span className=" mx-auto px-4 py-2 rounded-full bg-gray-100 text-[#F83002] font-medium">
         No. 1 Job Hunt Website
