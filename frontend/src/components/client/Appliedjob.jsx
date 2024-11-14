@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -9,72 +9,66 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { setgetAppliedJob } from "@/redux/jobSlice";
 
 const Appliedjob = () => {
-  const invoices = [
-    {
-      invoice: "INV001",
-      paymentStatus: "Paid",
-      totalAmount: "$250.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV002",
-      paymentStatus: "Pending",
-      totalAmount: "$150.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV003",
-      paymentStatus: "Unpaid",
-      totalAmount: "$350.00",
-      paymentMethod: "Bank Transfer",
-    },
-    {
-      invoice: "INV004",
-      paymentStatus: "Paid",
-      totalAmount: "$450.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV005",
-      paymentStatus: "Paid",
-      totalAmount: "$550.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV006",
-      paymentStatus: "Pending",
-      totalAmount: "$200.00",
-      paymentMethod: "Bank Transfer",
-    },
-    {
-      invoice: "INV007",
-      paymentStatus: "Unpaid",
-      totalAmount: "$300.00",
-      paymentMethod: "Credit Card",
-    },
-  ];
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const FetchAppliedJobs = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/application/getappliedjob",
+          {
+            withCredentials: true,
+          }
+        );
+        if (response.status === 200) {
+          dispatch(setgetAppliedJob(response.data));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    FetchAppliedJobs();
+  }, []);
+  const { getAppliedJob } = useSelector((store) => store.job);
+  // console.log(getAppliedJob);
+
   return (
     <div>
       <Table>
         <TableCaption>A list of your recent applied jobs.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Invoice</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Method</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
+            <TableHead className="w-[100px]">Date</TableHead>
+            <TableHead>JobRole</TableHead>
+            <TableHead>Company</TableHead>
+            <TableHead className="text-right">Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {invoices.map((invoice) => (
-            <TableRow key={invoice.invoice}>
-              <TableCell className="font-medium">{invoice.invoice}</TableCell>
-              <TableCell>{invoice.paymentStatus}</TableCell>
-              <TableCell>{invoice.paymentMethod}</TableCell>
+          {getAppliedJob?.application?.map((item, index) => (
+            <TableRow key={index}>
+              <TableCell className="font-medium">
+                {" "}
+                {new Date(item.createdAt).toLocaleDateString() || "N/A"}
+              </TableCell>
+              <TableCell>{item?.job?.title}</TableCell>
+              <TableCell>{item?.job?.company?.name}</TableCell>
               <TableCell className="text-right">
-                {invoice.totalAmount}
+                {item.status === "pending" ? (
+                  <Badge size="icon" variant="outline">
+                    {item?.status}
+                  </Badge>
+                ) : (
+                  <Badge size="icon" className="bg-green-500">
+                    {item?.status}
+                  </Badge>
+                )}
               </TableCell>
             </TableRow>
           ))}

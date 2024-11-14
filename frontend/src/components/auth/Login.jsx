@@ -17,7 +17,6 @@ const Login = () => {
   const dispatch = useDispatch();
   const { loading } = useSelector((store) => store.auth);
 
-
   const inputHandler = (e) => {
     const { id, value } = e.target;
     setInput({ ...input, [id]: value });
@@ -71,6 +70,7 @@ const Login = () => {
       });
       // dispatch(setUser(true));
       dispatch(setUser(response.data.user));
+      console.log(response.data.user);
     } catch (error) {
       // Handle error cases
       toast.error(error.response?.data?.message || "Something went wrong", {

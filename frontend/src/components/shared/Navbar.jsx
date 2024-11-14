@@ -7,11 +7,14 @@ import React, { useState } from "react";
 import { CgProfile } from "react-icons/cg";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { RxCross2 } from "react-icons/rx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { LogOutIcon, User2 } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { setUser } from "@/redux/authSlice";
+import axios from "axios";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,8 +24,28 @@ const Navbar = () => {
   };
 
   const { user } = useSelector((store) => store.auth);
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   // const user = false;
+
+  const logoutHandler = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/logout", {
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        dispatch(setUser(null));
+        toast.success(response.data.message);
+        navigate("/login"); // Redirects to login page after logout
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        error.response?.data?.message || "An error occurred during logout."
+      );
+    }
+  };
 
   return (
     <div>
@@ -44,24 +67,40 @@ const Navbar = () => {
           {/* Md viewpoint */}
           <div className="hidden md:block">
             <ul className="flex gap-6 items-center mr-32">
-              <Link to={"/"}>
-                <li>Home</li>
-              </Link>
-              <Link to={"/jobs"}>
-                <li>Jobs</li>
-              </Link>
+              {user && user?.role === "recruiter" ? (
+                <>
+                  <Link to={"/admin/companies"}>
+                    {" "}
+                    <li>Company</li>
+                  </Link>
+                  <Link to={"/admin/adminjobs"}>
+                    {" "}
+                    <li>Jobs</li>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link to={"/"}>
+                    <li>Home</li>
+                  </Link>
+                  <Link to={"/jobs"}>
+                    <li>Jobs</li>
+                  </Link>
 
-              <Link to={"/browse"}>
-                {" "}
-                <li>Browse</li>
-              </Link>
+                  <Link to={"/browse"}>
+                    {" "}
+                    <li>Browse</li>
+                  </Link>
+                </>
+              )}
+
               {user ? (
                 <div>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Avatar className="cursor-pointer">
                         <AvatarImage
-                          src="https://github.com/shadcn.png"
+                          src={user?.profile?.profile}
                           alt="@shadcn"
                         />
                         <AvatarFallback>CN</AvatarFallback>
@@ -70,35 +109,43 @@ const Navbar = () => {
                     <PopoverContent
                       side="bottom"
                       align="center"
-                      sideOffset={10} // Adjusts the distance from the trigger
-                      className="w-80 mt-2 border bg-white p-3 rounded-3xl mx-3"
+                      sideOffset={10}
+                      className="w-80 mt-2 border bg-white p-5 rounded-3xl shadow-lg"
                     >
-                      <div className="p-4 flex gap-6 items-center">
+                      <div className="flex items-center gap-4 p-4">
                         <Avatar className="cursor-pointer">
                           <AvatarImage
-                            src="https://github.com/shadcn.png"
+                            src={user?.profile?.profile}
                             alt="@shadcn"
                           />
                           <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
                         <div>
-                          <h4 className="font-medium mt-2">Koshish Khadka</h4>
-                          <p className="text-sm font-light text-justify">
-                            Lorem ipsum dolor sit amet consectetur adipisicing
-                            elit.{" "}
-                          </p>
+                          <h4 className="font-semibold">{user?.username}</h4>
+                          {user?.role === "student" && (
+                            <p className="text-sm font-light text-gray-500">
+                              {user?.profile?.bio || "Student at CareerHub"}
+                            </p>
+                          )}
                         </div>
                       </div>
-                      <div className="flex flex-col text-gray-600 ">
-                        <div className="flex w-fit items-center gap-2 cursor-pointer">
-                          <User2 />
-                          <Link to={"/profile"}><Button variant="link">View Profile</Button></Link>
-                        </div>
-                        <div className="flex w-fit items-center gap-2 cursor-pointer">
-                          {" "}
+                      <div className="flex flex-col gap-4 mt-4">
+                        {user?.role === "student" && (
+                          <Link
+                            to="/profile"
+                            className="flex items-center gap-2 text-gray-700 hover:text-blue-500"
+                          >
+                            <User2 />
+                            <span>View Profile</span>
+                          </Link>
+                        )}
+                        <button
+                          onClick={logoutHandler}
+                          className="flex items-center gap-2 text-red-600 hover:text-red-500"
+                        >
                           <LogOutIcon />
-                          <Button variant="link">Logout</Button>
-                        </div>
+                          <span>Logout</span>
+                        </button>
                       </div>
                     </PopoverContent>
                   </Popover>

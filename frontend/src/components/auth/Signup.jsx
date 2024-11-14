@@ -34,7 +34,7 @@ const Signup = () => {
     setInput({ ...input, file: e.target.files?.[0] });
   };
 
-  console.log(input);
+  // console.log(input);
 
   const submitHandler = async () => {
     const { username, email, phoneNumber, role, password, confirmpassword } =
@@ -101,7 +101,7 @@ const Signup = () => {
     }
   };
 
-  console.log(input);
+  // console.log(input);
   return (
     <div className="flex items-center justify-center min-h-screen mt-20">
       <div className="flex flex-col border m-4 p-16 rounded-xl shadow-lg ">
@@ -177,6 +177,7 @@ const Signup = () => {
               <input
                 accept="image/*"
                 type="file"
+                name="file"
                 className="cursor-pointer"
                 onChange={filesHandler}
               />
