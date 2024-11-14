@@ -55,18 +55,23 @@ const getAllJob = async (req, res) => {
         { description: { $regex: keyword, $options: "i" } },
       ],
     };
+
     const jobs = await Job.find(query)
       .populate({
         path: "company",
       })
       .sort({ createdAt: -1 });
 
+    // console.log(jobs);
+
     if (!jobs) {
       return res.status(404).json({ message: "Jobs not found" });
     }
+
     return res.status(200).json(jobs);
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -74,7 +79,8 @@ const getAllJob = async (req, res) => {
 const getJobById = async (req, res) => {
   try {
     const jobId = req.params.id;
-    const job = await Job.findById(jobId);
+    // console.log("jobid", jobId);
+    const job = await Job.findById(jobId).populate({ path: "applications" });
     if (!job) {
       return res.status(400).json({ message: "Job not found" });
     }
@@ -89,10 +95,17 @@ const getJobById = async (req, res) => {
 const getAdminJobs = async (req, res) => {
   try {
     const adminId = req.id;
-    const jobs = await Job.find({ created_by: adminId }).populate({
+    // console.log("Admin Id", adminId);
+    const jobs = await Job.find({ createdBy: adminId }).populate({
       path: "company",
       createdAt: -1,
     });
+    // const jobs = await Job.find({ createdBy: adminId });
+    // console.log("Jobs before populate:", jobs);
+
+    // const populatedJobs = await Job.populate(jobs, { path: "company" });
+    // console.log("Jobs after populate:", populatedJobs);
+
     if (!jobs) {
       return res.status(400).json({ message: "No jobs found" });
     }
